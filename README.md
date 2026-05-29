@@ -24,7 +24,17 @@ route correctly.
 
 **Query routing flow** — the two-stage decision (regex fast-path → LLM classifier):
 
-![Query router flow](docs/images/queryrouterflow.png)
+```
+route(query, history)
+│
+├─ regex _REALTIME_PATTERNS matches query?
+│     YES ──────────────────────────────▶ RouteDecision(route="search", fast_path=True)   [no LLM]
+│     NO
+│      │
+│      └─ build messages: [ROUTER_SYSTEM_PROMPT, query + last-4-turns history]
+│         │
+│         └─ LLM (temp=0, structured) ──▶ RouteDecision(route="search"|"direct", reason=...) [LLM]
+```
 
 **LangGraph agent graph** — `classify` branches to the `search` path or the
 `direct` path, both converging on `END`:
