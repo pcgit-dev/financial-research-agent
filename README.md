@@ -22,10 +22,6 @@ token-by-token, and remembers context across a conversation.
 | **Conversation memory** | SQLite (demo) through a `ConversationStore` interface → swap to Postgres/Redis in prod (`app/memory/`). |
 | **Production posture** | Pydantic-settings config, structured logging, typed exceptions → HTTP mapping, Docker multi-stage build, Gunicorn/Uvicorn workers, health checks. |
 
-Design follows **SOLID** throughout: every external dependency (LLM, search,
-storage) sits behind an abstraction the agent depends on, so providers are
-swapped without touching orchestration logic.
-
 ---
 
 ## Architecture at a glance
