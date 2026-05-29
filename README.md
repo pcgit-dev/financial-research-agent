@@ -104,6 +104,24 @@ A tiny streaming client is included: `python scripts/demo_stream.py "Current EUR
 
 ---
 
+## API in action
+
+The screenshots below show the agent responding in **Insomnia**, demonstrating
+both routing paths.
+
+**Direct path** — a conceptual question the agent answers from its own knowledge
+(`route: "direct"`, no search, no citations):
+
+![Insomnia — direct response to a conceptual query](docs/images/insomnia-search-query_current_direct.png)
+
+**Search path** — a time-sensitive question that triggers a live web search and
+returns a grounded answer with in-text `[n]` citations and a source list
+(`route: "search"`):
+
+![Insomnia — web-search response with citations](docs/images/insomnia-search-query_current_web_search.png)
+
+---
+
 ## Project layout
 
 ```
