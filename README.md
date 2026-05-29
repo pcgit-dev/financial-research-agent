@@ -10,6 +10,30 @@ token-by-token, and remembers context across a conversation.
 
 ---
 
+## How the agent routes a query
+
+The first decision the agent makes is whether a query needs a **live web search**
+or can be answered **directly** from the model's own knowledge. This is handled by
+`QueryRouter.route()` (`app/agent/router.py`) in two stages: a cheap regex
+match that matches obviously time-sensitive queries (e.g. anything
+mentioning *current*, *latest*, *today*, *stock price*) without spending an LLM
+call, and — for everything else — a temperature-0 LLM classifier constrained via
+`with_structured_output` to return exactly `"search"` or `"direct"` plus a reason.
+The last four conversation turns are passed in as context so follow-up questions
+route correctly.
+
+```
+route(query, history)
+│
+├─ regex _REALTIME_PATTERNS matches query?
+│     YES ──────────────────────────────▶ RouteDecision(route="search", fast_path=True)   [no LLM]
+│     NO
+│      │
+│      └─ build messages: [ROUTER_SYSTEM_PROMPT, query + last-4-turns history]
+│         │
+│         └─ LLM (temp=0, structured) ──▶ RouteDecision(route="search"|"direct", reason=...) [LLM]
+```
+
 ## Highlights
 
 | Capability | How it's delivered |
@@ -96,9 +120,6 @@ curl -N -X POST http://localhost:8000/query/stream -H "Content-Type: application
   -d "{\"query\": \"Current EUR/USD rate?\"}"
 ```
 
-A tiny streaming client is included: `python scripts/demo_stream.py "Current EUR/USD"`.
-
----
 
 ## API in action
 
@@ -160,4 +181,4 @@ All settings are environment variables (see `.env.example`). Key ones:
 | `TAVILY_API_KEY` | — | Enables Tavily when `auto`. |
 | `DATABASE_URL` | `sqlite:///./data/conversations.db` | Memory backend. |
 | `API_AUTH_KEY` | — | If set, requires `X-API-Key` header. |
-| `WEB_CONCURRENCY` | #cores | Gunicorn worker count. |
+
