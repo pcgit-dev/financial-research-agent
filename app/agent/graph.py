@@ -1,26 +1,4 @@
-"""LangGraph wiring.
-
-Defines the control flow:
-
-        ┌──────────┐
-        │  route   │
-        └────┬─────┘
-      search │ direct
-     ┌───────┴────────┐
-     ▼                ▼
- ┌────────┐   ┌────────────────┐
- │ search │   │ generate_direct │
- └───┬────┘   └────────┬────────┘
-     ▼                 │
-┌─────────────────┐    │
-│ generate_with_  │    │
-│    context      │    │
-└────────┬────────┘    │
-         ▼             ▼
-        END           END
-"""
 from __future__ import annotations
-
 from langgraph.graph import END, START, StateGraph
 
 from app.agent.nodes import AgentNodes
