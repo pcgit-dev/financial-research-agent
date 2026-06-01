@@ -32,7 +32,6 @@ class CitationModel(BaseModel):
     index: int = Field(..., description="1-based number used inline in the answer.")
     title: str
     url: str
-    published_date: str | None = None
 
 
 class QueryResponse(BaseModel):
@@ -41,8 +40,7 @@ class QueryResponse(BaseModel):
     answer: str = Field(..., description="Final answer, incl. inline [n] citations and a source list.")
     route: Literal["search", "direct"] = Field(..., description="Path the agent took.")
     route_reason: str = Field(..., description="Why the agent chose that path.")
-    search_provider: str | None = Field(None, description="Search backend used, if any.")
-    citations: list[CitationModel] = Field(default_factory=list)
+    sources: list[CitationModel] = Field(default_factory=list)
 
 
 class HealthResponse(BaseModel):

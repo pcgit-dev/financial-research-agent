@@ -37,8 +37,7 @@ class AgentResult:
     answer: str
     route: str
     route_reason: str
-    citations: list[Citation]
-    search_provider: str | None
+    sources: list[Citation]
     conversation_id: str
 
 
@@ -69,8 +68,8 @@ class FinanceResearchAgent:
         final_state: AgentState = await self._graph.ainvoke(initial)
 
         answer = final_state.get("answer", "")
-        citations = final_state.get("citations", [])
-        full_answer = answer + format_reference_list(citations)
+        sources = final_state.get("sources", [])
+        full_answer = answer + format_reference_list(sources)
 
         self._persist_turn(conversation_id, query, full_answer)
 
@@ -78,8 +77,7 @@ class FinanceResearchAgent:
             answer=full_answer,
             route=final_state.get("route", "direct"),
             route_reason=final_state.get("route_reason", ""),
-            citations=citations,
-            search_provider=final_state.get("search_provider"),
+            sources=sources,
             conversation_id=conversation_id,
         )
 
@@ -92,7 +90,7 @@ class FinanceResearchAgent:
           {"type": "metadata", "conversation_id": ...}
           {"type": "route", "route": ..., "reason": ...}
           {"type": "token", "content": "..."}
-          {"type": "sources", "citations": [...]}
+          {"type": "sources", "sources": [...]}
           {"type": "done", "answer": "<full text incl. references>"}
           {"type": "error", "message": "..."}
         """
@@ -102,7 +100,7 @@ class FinanceResearchAgent:
         yield {"type": "metadata", "conversation_id": conversation_id}
 
         answer_parts: list[str] = []
-        citations: list[Citation] = []
+        sources: list[Citation] = []
 
         try:
             # Multiplex two stream modes: node "updates" for routing/citations,
@@ -114,7 +112,7 @@ class FinanceResearchAgent:
                     event = self._handle_update(chunk)
                     if event:
                         if event["type"] == "sources":
-                            citations = event["citations"]
+                            sources = event["sources"]
                         yield event
                 elif mode == "messages":
                     token = self._extract_token(chunk)
@@ -124,7 +122,7 @@ class FinanceResearchAgent:
 
             # Append the formatted reference list as a final token burst so the
             # client's rendered text matches the buffered endpoint exactly.
-            reference_block = format_reference_list(citations)
+            reference_block = format_reference_list(sources)
             if reference_block:
                 answer_parts.append(reference_block)
                 yield {"type": "token", "content": reference_block}
@@ -162,7 +160,7 @@ class FinanceResearchAgent:
             if node_name == "search":
                 return {
                     "type": "sources",
-                    "citations": update.get("citations", []),
+                    "sources": update.get("sources", []),
                     "provider": update.get("search_provider"),
                 }
         return None

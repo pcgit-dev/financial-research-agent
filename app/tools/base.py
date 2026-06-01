@@ -19,7 +19,6 @@ class SearchResult:
     url: str
     content: str
     score: float = 0.0
-    published_date: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -27,7 +26,6 @@ class SearchResult:
             "url": self.url,
             "content": self.content,
             "score": self.score,
-            "published_date": self.published_date,
         }
 
 

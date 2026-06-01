@@ -1,10 +1,3 @@
-"""LLM provider abstraction.
-
-The rest of the codebase depends on the `LLMProvider` *interface*, never on a
-concrete vendor SDK (Dependency Inversion Principle). Swapping OpenAI for
-Anthropic, Azure-OpenAI or a local Ollama model becomes a one-class change with
-no ripple through the agent or API layers.
-"""
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

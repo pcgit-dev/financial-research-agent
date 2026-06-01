@@ -20,7 +20,7 @@ from app.llm.provider import LLMProvider
 
 logger = get_logger(__name__)
 
-# Strong signals that a query is time-sensitive → skip the LLM, go straight to search.
+# Strong signals that a query is time-sensitive → skip the LLM, go straight to search.//This must be internationalization support.
 _REALTIME_PATTERNS = re.compile(
     r"\b(current|latest|today|now|recent|live|breaking|this (week|month|year)|"
     r"stock price|exchange rate|yield|as of)\b",
