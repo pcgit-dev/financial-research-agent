@@ -23,7 +23,7 @@ class TavilySearchProvider(SearchProvider):
 
         self._client = TavilyClient(api_key=api_key)
 
-    def search(self, query: str, *, max_results: int = 5) -> SearchResponse:
+    def search(self, query: str, *, max_results: int = 3) -> SearchResponse:
         try:
             raw = self._client.search(
                 query=query,
@@ -41,7 +41,6 @@ class TavilySearchProvider(SearchProvider):
                 url=item.get("url", ""),
                 content=item.get("content", ""),
                 score=float(item.get("score", 0.0)),
-                published_date=item.get("published_date"),
             )
             for item in raw.get("results", [])
         ]

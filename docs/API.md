@@ -58,12 +58,11 @@ Run the agent and return the **complete** answer once generation finishes.
 | `answer` | string | Final answer incl. inline `[n]` citations and an appended **Sources** list. |
 | `route` | `"search"` \| `"direct"` | Path the agent chose. |
 | `route_reason` | string | One-sentence justification. |
-| `search_provider` | string \| null | `tavily` / `duckduckgo` when search ran, else `null`. |
-| `citations` | array | Numbered sources (see below). |
+| `sources` | array | Numbered sources (see below). |
 
-`citations[]` item:
+`sources[]` item:
 ```json
-{ "index": 1, "title": "Fed holds rates steady", "url": "https://...", "published_date": "2026-05-01" }
+{ "index": 1, "title": "Fed holds rates steady", "url": "https://..." }
 ```
 
 **Example (search path)**
@@ -71,19 +70,18 @@ Run the agent and return the **complete** answer once generation finishes.
 {
   "conversation_id": "3f9a1c2e8b7d4f06a1c2e8b7d4f06a1c",
   "query": "What was the latest Fed interest rate decision?",
-  "answer": "At its latest meeting the Federal Reserve held the federal funds target range at 4.25–4.50% [1], citing still-elevated core inflation [2].\n\n---\n**Sources:**\n[1] FOMC statement — 2026-05-01\n    https://www.federalreserve.gov/...\n[2] Reuters coverage — 2026-05-01\n    https://www.reuters.com/...",
+  "answer": "At its latest meeting the Federal Reserve held the federal funds target range at 4.25–4.50% [1], citing still-elevated core inflation [2].\n\n---\n**Sources:**\n[1] FOMC statement\n    https://www.federalreserve.gov/...\n[2] Reuters coverage\n    https://www.reuters.com/...",
   "route": "search",
   "route_reason": "Query contains a time-sensitive signal (fast-path).",
-  "search_provider": "tavily",
-  "citations": [
-    {"index": 1, "title": "FOMC statement", "url": "https://www.federalreserve.gov/...", "published_date": "2026-05-01"},
-    {"index": 2, "title": "Reuters coverage", "url": "https://www.reuters.com/...", "published_date": "2026-05-01"}
+  "sources": [
+    {"index": 1, "title": "FOMC statement", "url": "https://www.federalreserve.gov/..."},
+    {"index": 2, "title": "Reuters coverage", "url": "https://www.reuters.com/..."}
   ]
 }
 ```
 
 **Example (direct path)** — `"What is diversification?"` returns `route: "direct"`,
-`search_provider: null`, `citations: []`, and a definitional answer.
+`sources: []`, and a definitional answer.
 
 ---
 
@@ -98,7 +96,7 @@ Same request body as `/query`, but streams the answer as **Server-Sent Events**
 |---|---|---|
 | `metadata` | `conversation_id` | Sent first; capture for follow-ups. |
 | `route` | `route`, `reason` | Routing decision. |
-| `sources` | `citations[]`, `provider` | Emitted on the search path before tokens. |
+| `sources` | `sources[]`, `provider` | Emitted on the search path before tokens. |
 | `token` | `content` | One chunk of answer text. Concatenate in order. |
 | `done` | `answer` | Full answer text (incl. sources). Stream complete. |
 | `error` | `message` | Generation failed; stream ends. |
@@ -109,7 +107,7 @@ data: {"type": "metadata", "conversation_id": "3f9a..."}
 
 data: {"type": "route", "route": "search", "reason": "Query is time-sensitive."}
 
-data: {"type": "sources", "citations": [{"index": 1, "title": "...", "url": "...", "published_date": null}], "provider": "tavily"}
+data: {"type": "sources", "sources": [{"index": 1, "title": "...", "url": "..."}], "provider": "tavily"}
 
 data: {"type": "token", "content": "The EUR/USD rate is "}
 

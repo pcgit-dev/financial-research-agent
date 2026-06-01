@@ -1,8 +1,6 @@
 """LangGraph node implementations.
 
-Each node is a small, single-responsibility unit that reads the shared
-`AgentState` and returns a partial update. Dependencies (router, search,
-LLM) are injected via the constructor so nodes stay testable in isolation.
+Each node is a pure function that takes an AgentState dict as input and returns a dict of outputs.
 """
 from __future__ import annotations
 
@@ -54,13 +52,15 @@ class AgentNodes:
 
     # ---- Node: web search -------------------------------------------------
     def search(self, state: AgentState) -> AgentState:
-        response = self._search.search(
-            state["query"], max_results=self._settings.search_max_results
-        )
+        max_results = self._settings.search_max_results
+        response = self._search.search(state["query"], max_results=max_results)
+        # Enforce the cap even if a provider returns more than requested, so the
+        # answer's context and the `sources` list never exceed the configured max.
+        results = response.results[:max_results]
         return {
-            "search_results": response.results,
+            "search_results": results,
             "search_provider": response.provider,
-            "citations": build_citations(response.results),
+            "sources": build_citations(results),
         }
 
     # ---- Node: answer from sources (grounded synthesis) -------------------
@@ -99,7 +99,7 @@ class AgentNodes:
             HumanMessage(content=state["query"]),
         )
         result = self._answer_model.invoke(messages)
-        return {"answer": result.content, "citations": []}
+        return {"answer": result.content, "sources": []}
 
     # ---- Helpers ----------------------------------------------------------
     def _with_history(self, state: AgentState, system, user) -> list:

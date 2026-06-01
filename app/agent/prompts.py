@@ -1,8 +1,4 @@
-"""Prompt templates for routing and answer generation.
 
-Centralising prompts keeps them reviewable and version-controllable, separate
-from orchestration logic.
-"""
 from __future__ import annotations
 
 ROUTER_SYSTEM_PROMPT = """You are a routing classifier for a financial research \

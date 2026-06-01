@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     # ---- Search ----
     search_provider: Literal["auto", "tavily", "duckduckgo"] = "auto"
     tavily_api_key: str | None = None
-    search_max_results: int = 5
+    search_max_results: int = 3
 
     # ---- Memory ----
     database_url: str = "sqlite:///./data/conversations.db"

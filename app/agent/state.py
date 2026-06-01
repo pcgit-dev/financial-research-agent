@@ -16,7 +16,6 @@ class Citation(TypedDict):
     index: int       # 1-based number used in the answer text, e.g. "[1]"
     title: str
     url: str
-    published_date: str | None
 
 
 class AgentState(TypedDict, total=False):
@@ -37,4 +36,4 @@ class AgentState(TypedDict, total=False):
 
     # ---- Output ----
     answer: str
-    citations: list[Citation]
+    sources: list[Citation]

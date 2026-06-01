@@ -51,8 +51,7 @@ async def query(
         answer=result.answer,
         route=result.route,
         route_reason=result.route_reason,
-        search_provider=result.search_provider,
-        citations=result.citations,
+        sources=result.sources,
     )
 
 
